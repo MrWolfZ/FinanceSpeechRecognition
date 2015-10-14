@@ -1,0 +1,461 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<grammar version="1.0"
+         xml:lang="en-US"
+         mode="voice"
+         root="toplevel"
+         xmlns="http://www.w3.org/2001/06/grammar"
+         tag-format="semantics/1.0">
+    <rule id="toplevel" scope="public">
+        <one-of>
+            <item>
+                <ruleref uri="#Spent"/>
+                <tag> out.Values = rules.Spent; </tag>
+            </item>
+            <item>
+                <ruleref uri="#Gained"/>
+                <tag> out.Values = rules.Gained; </tag>
+            </item>
+            <item>
+                done
+                <tag> out.Exit = true; </tag>
+            </item>
+            <item>
+                again
+                <tag> out.Again = true; </tag>
+            </item>
+        </one-of>
+    </rule>
+
+    <rule id="Spent">
+        <example> spent 13.45 at coop on october 13 </example>
+        <example> spent 25 at lidl today </example>
+        <example> spent 100 francs at misc 3 days ago </example>
+
+        <item> spent </item>
+        <ruleref uri="#Amount"/>
+        <tag> out.Amount = -rules.Amount; </tag>
+        <item repeat="0-1">
+            <ruleref uri="#Currency"/>
+            <tag> out.Currency = rules.Currency; </tag>
+        </item>
+        <item repeat="0-1">
+            <item> for </item>
+            <ruleref uri="#Category"/>
+            <tag> out.Category = rules.Category; </tag>
+        </item>
+        <item> at </item>
+        <ruleref uri="#Location"/>
+        <tag> out.Location = rules.Location; </tag>
+        <item repeat="0-1">
+            <item> for </item>
+            <ruleref uri="#Category"/>
+            <tag> out.Category = rules.Category; </tag>
+        </item>
+        <one-of>
+            <item>
+                <item> on </item>
+                <ruleref uri="#Date"/>
+                <tag> out.Date = rules.Date; </tag>
+            </item>
+            <item>
+                <ruleref uri="#RelativeDate"/>
+                <tag> out.RelativeDate = rules.RelativeDate; </tag>
+            </item>
+        </one-of>
+    </rule>
+
+    <rule id="Gained">
+        <example> gained 13.45 from coop on october 13 </example>
+        <example> gained 25 from lidl today </example>
+        <example> gained 100 francs from misc 3 days ago </example>
+
+        <item> gained </item>
+        <ruleref uri="#Amount"/>
+        <tag> out.Amount = rules.Amount; </tag>
+        <item repeat="0-1">
+            <ruleref uri="#Currency"/>
+            <tag> out.Currency = rules.Currency; </tag>
+        </item>
+        <item> from </item>
+        <ruleref uri="#Location"/>
+        <tag> out.Location = rules.Location; </tag>
+        <one-of>
+            <item>
+                <item> on </item>
+                <ruleref uri="#Date"/>
+                <tag> out.Date = rules.Date; </tag>
+            </item>
+            <item>
+                <ruleref uri="#RelativeDate"/>
+                <tag> out.RelativeDate = rules.RelativeDate; </tag>
+            </item>
+        </one-of>
+    </rule>
+
+    <rule id="Amount">
+        <ruleref uri="#Number"/>
+        <tag> out = rules.Number; </tag>
+        <item repeat="0-1">
+            <ruleref uri="#Number"/>
+            <tag> out += rules.Number / 100; </tag>
+        </item>
+    </rule>
+
+    <rule id="Currency">
+        <one-of>
+            <item>
+                francs
+                <tag> out = "CHF"; </tag>
+            </item>
+            <item>
+                euros
+                <tag> out = "EUR"; </tag>
+            </item>
+            <item>
+                dollars
+                <tag> out = "USD"; </tag>
+            </item>
+        </one-of>
+    </rule>
+
+    <rule id="Location">
+        <one-of>
+            <item>
+                <item> Wall Mart </item>
+                <tag> out = "Wall Mart"; </tag>
+            </item>
+        </one-of>
+    </rule>
+
+    <rule id="Category">
+        <one-of>
+            <item>
+                <item> Groceries </item>
+                <tag> out = "Groceries"; </tag>
+            </item>
+            <item>
+                <item> Healthcare </item>
+                <tag> out = "Healthcare"; </tag>
+            </item>
+            <item>
+                <item> Entertainment </item>
+                <tag> out = "Entertainment"; </tag>
+            </item>
+            <item>
+                <item> Dining Out </item>
+                <tag> out = "Dining Out"; </tag>
+            </item>
+        </one-of>
+    </rule>
+
+    <rule id="Date">
+        <item>
+            <ruleref uri="#Month"/>
+            <tag> out.Month = rules.Month; </tag>
+            <ruleref uri="#Number"/>
+            <tag> out.Day = rules.Number; </tag>
+            <item repeat="0-1">
+                <ruleref uri="#Number"/>
+                <tag> out.Year = rules.Number; </tag>
+            </item>
+        </item>
+    </rule>
+
+    <rule id="RelativeDate">
+        <one-of>
+            <item>
+                today <tag> out = 0; </tag>
+            </item>
+            <item>
+                yesterday <tag> out = -1; </tag>
+            </item>
+            <item>
+                <ruleref uri="#Number"/>
+                <tag> out = -rules.Number; </tag>
+                <item> days ago </item>
+            </item>
+        </one-of>
+    </rule>
+
+    <rule id="Number">
+        <example> one </example>
+        <example> thirty-five </example>
+        <example> fifty-ninth </example>
+
+        <tag> out = 0; </tag>
+        <item repeat="0-1">
+            two thousand <tag> out = 2000; </tag>
+        </item>
+        <one-of>
+            <item>
+                <ruleref uri="#Digit"/>
+                <tag> out += rules.Digit; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> ten </item>
+                    <item> tenth </item>
+                </one-of>
+                <tag> out += 10; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> eleven </item>
+                    <item> eleventh </item>
+                </one-of>
+                <tag> out += 11; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> twelve </item>
+                    <item> twelfth </item>
+                </one-of>
+                <tag> out += 12; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> thirteen </item>
+                    <item> thirteenth </item>
+                </one-of>
+                <tag> out += 13; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> fourteen </item>
+                    <item> fourteenth </item>
+                </one-of>
+                <tag> out += 14; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> fifteen </item>
+                    <item> fifteenth </item>
+                </one-of>
+                <tag> out += 15; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> sixteen </item>
+                    <item> sixteenth </item>
+                </one-of>
+                <tag> out += 16; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> seventeen </item>
+                    <item> seventeenth </item>
+                </one-of>
+                <tag> out += 17; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> eigtheen </item>
+                    <item> eigtheenth </item>
+                </one-of>
+                <tag> out += 18; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> nineteen </item>
+                    <item> nineteenth </item>
+                </one-of>
+                <tag> out += 19; </tag>
+            </item>
+            <item>
+                <item>
+                    twenty <tag> out += 20; </tag>
+                </item>
+                <item repeat="0-1">
+                    <ruleref uri="#Digit"/>
+                    <tag> out += rules.Digit; </tag>
+                </item>
+            </item>
+            <item>
+                <item>
+                    thirty <tag> out += 30; </tag>
+                </item>
+                <item repeat="0-1">
+                    <ruleref uri="#Digit"/>
+                    <tag> out += rules.Digit; </tag>
+                </item>
+            </item>
+            <item>
+                <item>
+                    fourty <tag> out += 40; </tag>
+                </item>
+                <item repeat="0-1">
+                    <ruleref uri="#Digit"/>
+                    <tag> out += rules.Digit; </tag>
+                </item>
+            </item>
+            <item>
+                <item>
+                    fifty <tag> out += 50; </tag>
+                </item>
+                <item repeat="0-1">
+                    <ruleref uri="#Digit"/>
+                    <tag> out += rules.Digit; </tag>
+                </item>
+            </item>
+            <item>
+                <item>
+                    sixty <tag> out += 60; </tag>
+                </item>
+                <item repeat="0-1">
+                    <ruleref uri="#Digit"/>
+                    <tag> out += rules.Digit; </tag>
+                </item>
+            </item>
+            <item>
+                <item>
+                    seventy <tag> out += 70; </tag>
+                </item>
+                <item repeat="0-1">
+                    <ruleref uri="#Digit"/>
+                    <tag> out += rules.Digit; </tag>
+                </item>
+            </item>
+            <item>
+                <item>
+                    eigthy <tag> out += 80; </tag>
+                </item>
+                <item repeat="0-1">
+                    <ruleref uri="#Digit"/>
+                    <tag> out += rules.Digit; </tag>
+                </item>
+            </item>
+            <item>
+                <item>
+                    ninety <tag> out += 90; </tag>
+                </item>
+                <item repeat="0-1">
+                    <ruleref uri="#Digit"/>
+                    <tag> out += rules.Digit; </tag>
+                </item>
+            </item>
+            <item>
+                <item>
+                    <ruleref uri="#Digit"/>
+                    <tag> out += rules.Digit * 100; </tag>
+                </item>
+                <item>
+                    hundred
+                </item>
+            </item>
+        </one-of>
+    </rule>
+
+    <rule id="Digit">
+        <example> one </example>
+        <example> three </example>
+        <example> nine </example>
+
+        <one-of>
+            <item>
+                <one-of>
+                    <item> one </item>
+                    <item> first </item>
+                </one-of>
+                <tag> out = 1; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> two </item>
+                    <item> second </item>
+                </one-of>
+                <tag> out = 2; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> three </item>
+                    <item> third </item>
+                </one-of>
+                <tag> out = 3; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> four </item>
+                    <item> fourth </item>
+                </one-of>
+                <tag> out = 4; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> five </item>
+                    <item> fifth </item>
+                </one-of>
+                <tag> out = 5; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> six </item>
+                    <item> sixth </item>
+                </one-of>
+                <tag> out = 6; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> seven </item>
+                    <item> seventh </item>
+                </one-of>
+                <tag> out = 7; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> eight </item>
+                    <item> eigthth </item>
+                </one-of>
+                <tag> out = 8; </tag>
+            </item>
+            <item>
+                <one-of>
+                    <item> nine </item>
+                    <item> nineth </item>
+                </one-of>
+                <tag> out = 9; </tag>
+            </item>
+        </one-of>
+    </rule>
+
+    <rule id="Month">
+        <one-of>
+            <item>
+                January <tag> out = 1; </tag>
+            </item>
+            <item>
+                February <tag> out = 2; </tag>
+            </item>
+            <item>
+                March <tag> out = 3; </tag>
+            </item>
+            <item>
+                April <tag> out = 4; </tag>
+            </item>
+            <item>
+                May <tag> out = 5; </tag>
+            </item>
+            <item>
+                June <tag> out = 6; </tag>
+            </item>
+            <item>
+                July <tag> out = 7; </tag>
+            </item>
+            <item>
+                August <tag> out = 8; </tag>
+            </item>
+            <item>
+                September <tag> out = 9; </tag>
+            </item>
+            <item>
+                October <tag> out = 10; </tag>
+            </item>
+            <item>
+                November <tag> out = 11; </tag>
+            </item>
+            <item>
+                December <tag> out = 12; </tag>
+            </item>
+        </one-of>
+    </rule>
+</grammar>
