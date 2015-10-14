@@ -2,8 +2,6 @@ This is a simple project written in F# that allows the user to dictate financial
 
 Here are some examples that are understood by the program:
 
-"spent 15 dollars at wall mart for entertainment 3 days ago"
-
-"spent 6.42 at wall mart for groceries yesterday"
-
-"spent 8 euros for dining out at restaurant on August 7th"
+- spent 15 dollars at wall mart for entertainment 3 days ago
+- spent 6.42 at wall mart for groceries yesterday
+- spent 8 euros for dining out at restaurant on August 7th
