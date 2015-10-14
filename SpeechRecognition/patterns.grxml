@@ -125,6 +125,10 @@
                 <item> Wall Mart </item>
                 <tag> out = "Wall Mart"; </tag>
             </item>
+            <item>
+                <item> Restaurant </item>
+                <tag> out = "Restaurant"; </tag>
+            </item>
         </one-of>
     </rule>
 

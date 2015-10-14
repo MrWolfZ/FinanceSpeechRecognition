@@ -11,13 +11,25 @@ let main argv =
     let parse transactions result =
         match result with
         | Again -> 
-            printfn "Again"
-            List.tail transactions
+            match transactions with
+            | [] -> []
+            | ts ->             
+                printfn "Removed last transaction!"
+                List.tail ts
         | Result r -> 
             let t = parseRecognitionResult r
             printfn "%s" <| writeEntry t
             t::transactions
 
+    printfn """You can now start dictating transactions. Examples:
+"spent 15 dollars at wall mart for entertainment 3 days ago"
+"spent 6.42 at wall mart for groceries yesterday"
+"spent 8 euros for dining out at restaurant on August 7th"
+
+Say "Again" to remove the last entered transaction.
+Say "Done" to finish dictation. A file containing all transactions will be written to your desktop.
+"""
+    
     let list = recognize parse []
 
     let entries = List.rev list |> List.map writeEntry
